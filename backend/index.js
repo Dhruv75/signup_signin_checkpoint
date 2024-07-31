@@ -1,16 +1,36 @@
 const express = require("express");
 const app = express();
+const mongoose = require("mongoose");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const zodSchema = require("./auth_validator.js");
+const userRoutes = require("./router/user.js");
+require("dotenv").config();
 
-app.get("/", function (req, res) {
-  res.send("This is the Home page");
-});
-app.get("/signup", function (req, res) {
-  res.send("This is the Signup page");
-});
-app.get("/login", function (req, res) {
-  res.send("This is The Login page");
+console.log(process.env.JWT_SECRET);
+
+app.use(cors());
+
+app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/user", userRoutes);
+app.use("/", (req, res) => {
+  res.send("This is home page ");
 });
 
-app.listen(3000, () => {
-  console.log("server started on port 3000");
+async function ConnectDB() {
+  try {
+    await mongoose.connect("mongodb://127.0.0.1:27017/paytmProd");
+    console.log("Connected to mongoDB");
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error.message);
+  }
+}
+
+ConnectDB();
+
+app.listen(5000, () => {
+  console.log("server started on port 5000");
 });
